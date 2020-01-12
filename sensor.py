@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import os
 import glob
 import time
@@ -32,7 +34,7 @@ def read_temp():
 		# temp_f = round((temp_c * 9.0 / 5.0 + 32.0), 3)
 	return temp_c
 
-print("This saves 2 files: tempLog.txt, and tempLogVerbose.txt.")
+print("This saves 2 files: tempLog.csv, and tempLogVerbose.csv.")
 print("tempLog.txt contains averages of readings taken every 5 minutes (or time specified), with the timestamp being that of the last reading.")
 print("tempLogVerbose contains every single temperature reading taken, with timestamps indicating time taken.")
 
@@ -44,10 +46,12 @@ while True:
 		tempsC.append(tempC)
 		tempsF.append(tempF)
 		now = datetime.now()
-		timeStr = now.strftime("%m/%d/%Y %H:%M:%S")
-		out = "{0} -> {1}, {2} (c, f)".format(timeStr, tempC, tempF)
+		timeStr = now.strftime("%m/%d/%Y,%H:%M:%S")
+		out = "{0},{1},{2}".format(timeStr, tempC, tempF)
 		print(out)
-		with open("tempLogVerbose.txt", "a") as verbose:
+		with open("tempLogVerbose.csv", "a") as verbose:
+			if os.stat("tempLogVerbose.csv").st_size == 0:
+				verbose.write("date,time,c,f\n")
 			out = "{0}\n".format(out)
 			verbose.write(out)
 		i += 1
@@ -55,10 +59,12 @@ while True:
 	avgC = round((sum(tempsC)/len(tempsC)), 3)
 	avgF = round((sum(tempsF)/len(tempsF)), 3)
 	now = datetime.now()
-	timeStr = now.strftime("%m/%d/%Y %H:%M:%S")
-	avgOut = ("{0} -> {1}, {2} (c, f)").format(timeStr, avgC, avgF)
+	timeStr = now.strftime("%m/%d/%Y,%H:%M:%S")
+	avgOut = ("{0},{1},{2}").format(timeStr, avgC, avgF)
 	print("Saving Average...")
-	with open("tempLog.txt", "a") as file:
+	with open("tempLog.csv", "a") as file:
+		if os.stat("tempLog.csv").st_size == 0:
+			file.write("date,time,c,f\n")
 		avgOut = ("{0}\n").format(avgOut)
 		file.write(avgOut)
 		tempsC = []
